@@ -1,0 +1,15 @@
+.demo-option {
+	padding: 50px;
+	width: 200px;
+	border: thin solid black;
+	text-align: center;
+	font-weight: bold;	
+}
+.demo-option-a {
+	color: #efefef;
+	background-color: Brown;
+}
+.demo-option-b {
+	color: #333333;
+	background-color: Gold;
+}

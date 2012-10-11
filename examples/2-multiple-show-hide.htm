@@ -1,0 +1,38 @@
+<html>
+<head>
+
+<script src="./jquery.js"></script>
+<script src="../conductrics.jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="./style.css">
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		// Initialize plugin
+		$.conductrics({
+			baseUrl:'http://localhost',
+			owner: 'nate',
+			apiKey: '123'
+		})
+
+		// Have Conductrics either show or hide something
+		$('.demo-option-a').conductrics('toggle', {agent:'jquery-example-2-a'})
+		$('.demo-option-a').conductrics('toggle', {agent:'jquery-example-2-b'})
+
+		// Send a reward to Conductrics when success is achieved
+		$('.demo-goal').click(function() {
+			$.conductrics('send-goal')
+		})
+
+	})
+</script>
+
+</head>
+<body>
+	<!-- This div gets shown or hidden -->
+	<div class="demo-option demo-option-a">Option A</div>
+	<div class="demo-option demo-option-b">Option B</div>
+	<!-- Button to send reward to Conductrics -->
+	<button class="demo-goal" type="button">I Love This Page</button>
+</body>
+</html>
