@@ -3,7 +3,7 @@
 
 highlighted = null
 
-mousemove = (evt) ->
+mousemove = (callback) -> (evt) ->
 	evt.preventDefault()
 	evt.stopPropagation()
 	elem = document.elementFromPoint evt.pageX, evt.pageY
@@ -13,79 +13,101 @@ mousemove = (evt) ->
 		pos = $(elem).addClass("autopick-highlight").offset()
 		width = $(elem).width() + 1
 		height = $(elem).height() + 1
-		top = (pos.top - 1) + "px"
-		left = (pos.left - 1) + "px"
-		right = (pos.left + width) + "px"
-		bottom = (pos.top + height) + "px"
+		top = (pos.top - 2)
+		left = (pos.left - 2)
+		right = (pos.left + width + 3)
+		bottom = (pos.top + height + 3)
 		$("#autopick-overlay-top").css
-			width: "100%"
+			left: 0
 			top: 0
+			width: "100%"
+			height: top + "px"
+		$("#autopick-overlay-bottom").css
 			left: 0
-			height: top
-		$("#autopick-overlay-left").css
-			width: left
-			left: 0
-			top: top
-			height: "100%"
-		$("#autopick-overlay-right").css
-			left: right
-			top: top
+			top: bottom + "px"
 			height: "100%"
 			width: "100%"
-		$("#autopick-overlay-bottom").css
-			left: left
-			top: bottom
-			height: "100%"
-			width: width
+		$("#autopick-overlay-left").css
+			width: left + "px"
+			left: 0
+			top: top + "px"
+			height: (bottom - top) + "px"
+		$("#autopick-overlay-right").css
+			left: right + "px"
+			top: top + "px"
+			height: (bottom - top) + "px"
+			width: "100%"
 
-	$("#autopick-tooltip").show().css
-		top: (evt.pageY + 10) + "px"
-		left: (evt.pageX + 10) + "px"
-
-click = (evt) ->
+click = (callback) -> (evt) ->
 	evt.preventDefault()
 	evt.stopPropagation()
+	callback(report(evt.target))
+	free()
+
+describe = (node) ->
+	return "null" if node is null
+	"#{node.nodeName.toLowerCase()}" +
+		(if node.id then "##{node.id}" else "") +
+		(if node.className then "." + node.className.split(" ").join(".") else "")
+
+report = (node) ->
+	return "null" if node is null
+	ret =
+		id: []
+		class: {}
+		path: []
+		parents: []
+	p = node
+	parents = []
+	while true
+		if p = p.parentNode
+			break if p is document
+			ret.parents.unshift p
+			ret.path.unshift describe(p)
+			if p.id
+				ret.id.unshift p.id
+			p.className?.split(" ").forEach (x) -> ret.class[x] = 1
+		else break
+	delete ret[""]
+	return ret
 
 hijacked = false
-hijack = ->
+hijack = (callback) ->
 	return if hijacked
-	$(document).bind('mousemove', mousemove).bind('click', click)
+	$(document).bind('mousemove', mousemove callback).bind('click', click callback)
 	hijacked = true
 free = ->
 	return unless hijacked
-	$(document).unbind('mousemove', mousemove).unbind('click', click)
-	$("#autopick-tooltip").hide()
+	$(document)
+		.unbind('mousemove')
+		.unbind('click')
+	$("#autopick-tooltip, .autopick-overlay").hide()
 	hijacked = false
 
-jQuery.autoPick = (command = 'toggle') ->
+jQuery.autoPick = (command, callback) ->
 	if $("style#autopick-style").length is 0
 		$("head").append("<style id='autopick-style'>
 			.autopick-highlight {
 			}
 			.autopick-overlay {
 				position: absolute;
-				opacity: 0.7;
+				opacity: 0.5;
 				background-color: black;
 			}
 			#autopick-tooltip {
 				position: absolute;
-				opacity: 0.7;
 				background-color: khaki;
 			}
 		</style>")
-		$("body").append("<span id='autopick-tooltip' style='display:none'>This is a tooltip.</span>")
 		$("body").append("<div id='autopick-overlay-top' class='autopick-overlay'>&nbsp;</div>")
 		$("body").append("<div id='autopick-overlay-left' class='autopick-overlay'>&nbsp;</div>")
 		$("body").append("<div id='autopick-overlay-right' class='autopick-overlay'>&nbsp;</div>")
 		$("body").append("<div id='autopick-overlay-bottom' class='autopick-overlay'>&nbsp;</div>")
 	switch command
-		when 'hijack' then hijack()
+		when 'hijack' then hijack(callback)
 		when 'free' then free()
-		when 'toggle' then free() if hijacked else hijack()
+		when 'toggle' then free() if hijacked else hijack(callback)
 
-	p = @[0]
-	while p
-		p = p.parentNode
 
 
 		
