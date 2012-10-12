@@ -25,9 +25,10 @@ This plugin also provides some helpers that make it particularly easy to:
 2. Include the plugin file (conductrics.jquery.js).
 3. Use the init() function to provide your 'account owner' code and API key from Conductrics.
 
-
-
-
+```html
+<script src="./jquery.js"></script>
+<script src="../conductrics.jquery.js"></script>
+```
 
 ## Main Learning API
 
