@@ -1,0 +1,47 @@
+<html>
+	<head>
+		<title>Conductrics Autopicker</title>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+		<script type="text/javascript" src="../js/autopicker.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$.autoPick('hijack', function(chosen) {
+					console.log(chosen);
+				});
+			})
+		</script>
+		<style>
+			.blue { background-color: skyblue }
+			.purple { background-color: slateblue }
+			.green { background-color: seagreen }
+			.red { background-color: IndianRed }
+			.orange { background-color: Goldenrod }
+			.pink { background-color: pink }
+			.block {
+				display: block;
+				margin: 10px 2px 2px 20px;
+				border: 1px solid gray;
+			}
+			.half {
+				width: 40%;
+				float: left;
+			}
+		</style>
+	</head>
+	<body>
+		<div class='blue block' id="bluediv">
+			Blue Div
+			<div class='red block'>
+				Red Div
+				<p class='purple half block' id="purplepara">
+					Purple Paragraph
+					<span class='green block'>
+						Green Span
+						<b class='orange block'>Orange Text</b>
+					</span>
+				</p>
+				<div class='pink half block'>Pink Div</div>
+			</div>
+		</div>
+	</body>
+</html>
