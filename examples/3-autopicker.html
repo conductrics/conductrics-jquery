@@ -1,15 +1,6 @@
 <html>
 	<head>
 		<title>Conductrics Autopicker</title>
-		<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-		<script type="text/javascript" src="../js/autopicker.js"></script>
-		<script type="text/javascript">
-			$(document).ready(function() {
-				$.autoPick('hijack', function(chosen) {
-					console.log(chosen);
-				});
-			})
-		</script>
 		<style>
 			.blue { background-color: skyblue }
 			.purple { background-color: slateblue }
@@ -26,9 +17,13 @@
 				width: 40%;
 				float: left;
 			}
+			.long {
+				height: 400px;
+			}
 		</style>
 	</head>
 	<body>
+		<a href="javascript:s = document.createElement('script');s.src='http://localhost/Projects/mpath/client/jquery/js/autopicker.js';window.autoPickReady = function(){$.autoPick('hijack', function(chosen) { console.log(chosen); })};document.head.appendChild(s);">Launch Picker</a>
 		<div class='blue block' id="bluediv">
 			Blue Div
 			<div class='red block'>
@@ -41,6 +36,24 @@
 					</span>
 				</p>
 				<div class='pink half block'>Pink Div</div>
+			</div>
+		</div>
+		<div class='blue long block' id='longdiv'>
+			Long Div
+			<div class='half pink black' id='pinkdiv'>
+				Another Pink Div
+			</div>
+			<div class='green block'>
+				Green Div
+			</div>
+			<div class='green block'>
+			<div class='green block'>
+			<div class='green block'>
+				Green Div
+			</div>
+				Green Div
+			</div>
+				Green Div
 			</div>
 		</div>
 	</body>
