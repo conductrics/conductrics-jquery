@@ -103,15 +103,12 @@
 		'expire-session': function(options, callback) {
 			options = $.extend({
 				agent: settings.agent,
-				session: settings.session,
-				reward: null
+				session: settings.session
 			}, options);
 
 			var url = constructUrl(['expire'], options);
 			var data = {apiKey: settings.apiKey};
-			if (options.reward) {data.reward = options.reward};
 			if (options.session) {data.session = options.session};
-			if (options.goal) {data.goal = options.goal}
 
 			doAjax(url, 'GET', data, function(response, textStatus, jqXHR) {
 				if (typeof callback == 'function') {

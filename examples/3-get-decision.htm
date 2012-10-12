@@ -1,6 +1,6 @@
 <html>
 <head>
-	
+
 <script src="./jquery.js"></script>
 <script src="../conductrics.jquery.js"></script>
 <link rel="stylesheet" type="text/css" href="./style.css">
@@ -10,13 +10,22 @@
 	$.conductrics({
 		owner: 'nate',
 		apiKey: '123',
-		agent:'jquery-example-1'
+		agent: 'jquery-example-3'
 	})
 
 	$(document).ready(function() {
 
-		// Have Conductrics either show or hide something
-		$('.demo-option-a').conductrics('toggle')
+		// Get a decision from Conductrics
+		$.conductrics('get-decision', {choices:['a', 'b']}, function(selection) {
+			switch (selection.code) {
+				case 'a':
+					// do something!
+					break;
+				case 'b':
+					// do something else!
+					break;
+			}
+		})
 
 		// Send a reward to Conductrics when success is achieved
 		$('.demo-goal').click(function() {
@@ -28,8 +37,6 @@
 
 </head>
 <body>
-	<!-- This div gets shown or hidden -->
-	<div class="demo-option demo-option-a">Option A</div>
 	<!-- Button to send reward to Conductrics -->
 	<button class="demo-goal" type="button">I Love This Page</button>
 </body>
