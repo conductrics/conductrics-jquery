@@ -9,7 +9,7 @@ do init = ->
 		return
 
 	highlighted = null
-	basePath = "/"
+	basePath = "http://api.conductrics.com/js/"
 
 	mousemove = (callback) -> (evt) ->
 		evt.preventDefault()
@@ -118,14 +118,20 @@ do init = ->
 				evt.stopPropagation()
 				hijack (chosen) ->
 					console.log chosen
+					selectorStr = chosen.path[-1..]
 					$('.autopick-dialog-selector-input')
-						.val(chosen.path[-1..])
+						.val(selectorStr)
 						.focus()
+
 		$('.autopick-dialog-selector-input')
 			.bind 'focusin keyup', ->
 				selectorStr = $(this).val()
 				$.autoPick('unhighlight-all')
 				$.autoPick('highlight', selectorStr)
+				if selectorStr.length > 0
+					$('.autopick-dialog-snippet-btn').removeAttr('disabled')
+				else
+					$('.autopick-dialog-snippet-btn').attr('disabled', 'disabled')
 			.bind 'focusout', ->
 				$.autoPick('unhighlight-all')
 		$('.autopick-dialog-snippet-btn')
@@ -134,7 +140,7 @@ do init = ->
 				selectorStr = group.find('.autopick-dialog-selector-input').val()
 				return unless selectorStr.length > 0
 				snippet = $.autoPick 'snippet', selectorStr
-				snippetShow snippet			
+				snippetShow snippet	
 
 	dialogFinish = ->
 		$('.autopick-dialog').remove()
@@ -178,9 +184,10 @@ do init = ->
 			$("head").append("<style id='autopick-style'>
 				.autopick-highlight { border: 1px solid red; background-color: khaki; }
 				.autopick-overlay { position: absolute; opacity: 0.5; background-color: black; }
-				.autopick-dialog { position: absolute; top: 10px; left: 10px; background-color:lightyellow; border: thin solid black; border-radius:4px; padding: 15px; box-shadow: 2px 2px 5px #888;}
+				.autopick-dialog { position: absolute; z-index:10000; top: 10px; left: 10px; background-color:lightyellow; border: thin solid black; border-radius:4px; padding: 15px; box-shadow: 2px 2px 5px #888;}
 				.autopick-dialog pre { color:#0000bb; font-size:12px; font-family: monospace; }
 				.autopick-dialog button { color:navy; padding:5px; }
+				.autopick-dialog label { font-size: 12px; font-family:sans-serif; }
 			</style>")
 			$("body").append("<div id='autopick-overlay-top' class='autopick-overlay'>&nbsp;</div>")
 			$("body").append("<div id='autopick-overlay-left' class='autopick-overlay'>&nbsp;</div>")
