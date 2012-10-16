@@ -88,7 +88,6 @@ do init = ->
 		$(document).bind('mousemove', mousemove callback).bind('click', click callback)
 		hijacked = true
 	free = ->
-		console.log "free-ing"
 		return unless hijacked
 		$(document)
 			.unbind('mousemove')
@@ -98,14 +97,14 @@ do init = ->
 
 	dialogShow = ->
 		$('body').append """
-			<div class="autopicker-dialog">
+			<div class="autopick-dialog">
 				<form>
-					<div class='autopicker-dialog-selector-group'>
-						<label for="selectorShowHide">Show/Hide What?:</label>
-						<input id="selectorShowHide" class='autopicker-dialog-selector-input' type="text" placeholder="click ... to choose"/>
-						<button class='autopicker-dialog-selector-btn' type="button">...</button>
+					<div class='autopick-dialog-selector-group'>
+						<label for="selectorShowHide">Show/Hide What?</label>
+						<input id="selectorShowHide" class='autopick-dialog-selector-input' type="text" placeholder="click ... to choose"/>
+						<button class='autopick-dialog-selector-btn' type="button">...</button>
 						<div>
-							<button class="autopicker-dialog-snippet-btn" type="button">Next</button>
+							<button class="autopick-dialog-snippet-btn" type="button">Next</button>
 						</div>
 					</div>
 				</form>
@@ -113,45 +112,45 @@ do init = ->
 		"""
 
 		# wire up dialog
-		$('.autopicker-dialog-selector-btn')
+		$('.autopick-dialog-selector-btn')
 			.click (evt) ->
 				evt.preventDefault()
 				evt.stopPropagation()
 				hijack (chosen) ->
 					console.log chosen
-					$('.autopicker-dialog-selector-input')
+					$('.autopick-dialog-selector-input')
 						.val(chosen.path[-1..])
 						.focus()
-		$('.autopicker-dialog-selector-input')
+		$('.autopick-dialog-selector-input')
 			.bind 'focusin keyup', ->
 				selectorStr = $(this).val()
 				$.autoPick('unhighlight-all')
 				$.autoPick('highlight', selectorStr)
 			.bind 'focusout', ->
 				$.autoPick('unhighlight-all')
-		$('.autopicker-dialog-snippet-btn')
+		$('.autopick-dialog-snippet-btn')
 			.bind 'click', ->
-				group = $(this).closest('.autopicker-dialog-selector-group')
-				selectorStr = group.find('.autopicker-dialog-selector-input').val()
+				group = $(this).closest('.autopick-dialog-selector-group')
+				selectorStr = group.find('.autopick-dialog-selector-input').val()
 				return unless selectorStr.length > 0
 				snippet = $.autoPick 'snippet', selectorStr
 				snippetShow snippet			
 
 	dialogFinish = ->
-		$('.autopicker-dialog').remove()
+		$('.autopick-dialog').remove()
 	
 	snippetShow = (snippet) ->
 		$('body').append """
-			<div class="autopicker-dialog">
+			<div class="autopick-dialog">
 				<p>Great! Here's the code snippet to paste into your page:</p>
 				<pre></pre>
 				<div>
-					<button class="autopicker-dialog-snippet-done-btn" type="button">Finished</button>
+					<button class="autopick-dialog-snippet-done-btn" type="button">Finished</button>
 				</div>
 			</div>
 		"""
-		$('.autopicker-dialog pre').text(snippet.replace(/\t/g, '  '))
-		$('.autopicker-dialog-snippet-done-btn').click ->
+		$('.autopick-dialog pre').text(snippet.replace(/\t/g, '  '))
+		$('.autopick-dialog-snippet-done-btn').click ->
 			$.autoPick 'finish'
 
 	generateCodeToPaste = (selectorStr) ->
@@ -179,9 +178,9 @@ do init = ->
 			$("head").append("<style id='autopick-style'>
 				.autopick-highlight { border: 1px solid red; background-color: khaki; }
 				.autopick-overlay { position: absolute; opacity: 0.5; background-color: black; }
-				.autopicker-dialog { position: absolute; top: 10px; left: 10px; background-color:lightyellow; border: thin solid black; border-radius:4px; padding: 15px; box-shadow: 2px 2px 5px #888;}
-				.autopicker-dialog pre { color:#0000bb; font-size:12px; font-family: monospace; }
-				.autopicker-dialog button { color:navy; padding:5px; }
+				.autopick-dialog { position: absolute; top: 10px; left: 10px; background-color:lightyellow; border: thin solid black; border-radius:4px; padding: 15px; box-shadow: 2px 2px 5px #888;}
+				.autopick-dialog pre { color:#0000bb; font-size:12px; font-family: monospace; }
+				.autopick-dialog button { color:navy; padding:5px; }
 			</style>")
 			$("body").append("<div id='autopick-overlay-top' class='autopick-overlay'>&nbsp;</div>")
 			$("body").append("<div id='autopick-overlay-left' class='autopick-overlay'>&nbsp;</div>")

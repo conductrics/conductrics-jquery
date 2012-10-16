@@ -2,6 +2,8 @@ COFFEE=node_modules/.bin/coffee
 
 SRC_FILES=$(shell ls *.coffee)
 
+PATH=/usr/local/bin:$(shell echo $$PATH)
+
 all: js/autopicker.js
 
 js:
