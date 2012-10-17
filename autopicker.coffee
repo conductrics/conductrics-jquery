@@ -1,9 +1,18 @@
 do init = ->
 	console.log 'initing autopicker'
-	if not window.jQuery?
+
+	$ = window.jQuery or window.jQ or window.$
+	console.log "dollar is now", $
+
+	unless $?.fn
+		_prev = window.$
 		s = document.createElement('script')
 		s.src = 'http://code.jquery.com/jquery-latest.min.js'
-		s.onload = init
+		s.onload = -> 
+			window.jQuery = window.jQuery.noConflict()
+			window.$ = _prev
+			init()
+			console.log 'injected jQuery'
 		console.log 'injecting jQuery'
 		document.head.appendChild(s)
 		return
@@ -136,7 +145,8 @@ do init = ->
 				$.autoPick('unhighlight-all')
 		$('.autopick-dialog-snippet-btn')
 			.bind 'click', ->
-				group = $(this).closest('.autopick-dialog-selector-group')
+				console.log 'before closest', $().closest, $
+				group = $(this).parents('.autopick-dialog-selector-group')
 				selectorStr = group.find('.autopick-dialog-selector-input').val()
 				return unless selectorStr.length > 0
 				snippet = $.autoPick 'snippet', selectorStr
@@ -179,7 +189,7 @@ do init = ->
 		"""
 		return str
 
-	jQuery.autoPick = (command, callback) ->
+	$.autoPick = (command, callback) ->
 		if $("style#autopick-style").length is 0
 			$("head").append("<style id='autopick-style'>
 				.autopick-highlight { border: 1px solid red; background-color: khaki; }
