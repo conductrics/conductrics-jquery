@@ -124,7 +124,7 @@ This is often not needed at all, but if your site or app is such that your users
 Given a jQuery selector, shows or hides whatever the selector matches:
 
 ```javascript
-	$(function() {
+	$(document).ready(function() {
 	
 		// Have Conductrics either show or hide something
 		$('.something').conductrics('toggle')
@@ -136,7 +136,7 @@ Given a jQuery selector, shows or hides whatever the selector matches:
 Given a jQuery select which matches two or more elements, shows one of the elements and hides the others:
 
 ```javascript
-	$(function() {
+	$(document).ready(function() {
 	
 		// Have Conductrics either show or hide something
 		$('.areas-to-test-against-each-other').conductrics('choose-best')
