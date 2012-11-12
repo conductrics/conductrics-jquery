@@ -149,7 +149,7 @@ Given an array of URLs, redirects to one of the URLs dynamically, favoring the b
 The first URL in the list will be the "fallback" if there is a problem reaching your Conductrics agent for any reason.
 
 ```javascript
-	$(function() {
+	$(document).ready(function() {
 	
 		// Redirect to one of these URLs
 		$.conductrics('redirect-to-best-url', ['http://google.com', 'http://bing.com'])
