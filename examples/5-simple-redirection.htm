@@ -1,0 +1,24 @@
+<html>
+<head>
+	
+<script src="./jquery.js"></script>
+<script src="../conductrics.jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="./style.css">
+
+<script type="text/javascript">
+	// Initialize plugin
+	$.conductrics({
+		owner: 'nate',
+		apiKey: 'UKICgZRAnfTwnePY',
+		agent:'jquery-example-5'
+	})
+
+	$(document).ready(function() {
+		$.conductrics('redirect-to-best-url', ['http://nytimes.com', 'http://huffpost.com'] )
+	})
+</script>
+
+</head>
+<body>
+</body>
+</html>

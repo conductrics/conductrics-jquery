@@ -10,7 +10,8 @@
 				'baseUrl': 'http://api.conductrics.com',
 				'apiKey': null,
 				'agent': null,
-				'session': null
+				'session': null,
+				'timeout': 500
 			}, settingz)
 
 			return this;
@@ -20,7 +21,7 @@
 		'toggle': function(optionz, callback) {
 			var $this = $(this);
 			// developer may override any of these defaults
-			options = $.extend({
+			var options = $.extend({
 				choices: ['show', 'hide'],
 				initial: 'hide'
 			}, optionz);
@@ -33,11 +34,27 @@
 			return this;
 		},
 
+		'apply-helpers': function(optionz, callback) {
+			var $this = $(this);
+			var options = $.extend({
+				helpers:[]
+			}, optionz);
+
+			for (var i in options.helpers) {
+				var helper = options.helpers[i];
+				if (helper.selector && helper.helper && helper.options) {
+					if (['toggle','choose-best'].indexOf(helper.helper) >= 0) {
+						// hmm, we want to call toggle() or whatever, but we don't want to get the decision again...
+					}
+				}
+			}
+		},
+
 		// Simple Helper API
 		'choose-best': function(optionz, callback) {
 			var $this = $(this);
 			// developer may override any of these defaults
-			options = $.extend({
+			var options = $.extend({
 				choices: $this.length,
 				initial: 'hide'
 			}, optionz);
@@ -45,18 +62,38 @@
 			processSelection(options.initial, $this);
 			// Call out to Conductrics
 			methods['get-decision'](options, function(selection) {
-				i = parseInt(selection.code)
+				var i = parseInt(selection.code)
 				processSelection('show', $this.eq(i));
 			})
+			return this;
+		},
+
+		// Simple Helper API
+		'redirect-to-best-url': function(urls, optionz, callback) {
+			// developer may override any of these defaults
+			var options = $.extend({
+			}, optionz);
+			options.choices = urls.length;
+
+			var selectedUrl = urls[0]; // in case anything goes wrong, we'll fall back to this
+			
+			methods['get-decision'](options, function(selection) {
+				if (selection.code != null) {
+					selectedUrl = urls[selection.code];
+				}
+				window.location.replace(selectedUrl);
+			});
+
 			return this;
 		},
 
 		// Core API
 		'get-decision': function(options, callback) {
 			// developer may override any of these defaults
-			options = $.extend({
+			var options = $.extend({
 				agent: settings.agent,
 				session: settings.session,
+				timeout: settings.timeout,
 				decision: 'decision-1',
 				choices: ['a','b']
 			}, options);
@@ -65,11 +102,15 @@
 			if (!ensure(settings, ['baseUrl', 'apiKey'])) { return }; // Bail if we don't have enough info
 
 			var url = constructUrl(['decisions', options.choices.toString()], options);
-			var data = {apiKey: settings.apiKey};
+			var data = {apikey: settings.apiKey};
 			if (options.session) {data.session = options.session};
 
+			var selection = {code:options.choices[0]} // if anything goes wrong, we'll fall back to this
+
 			doAjax(url, 'GET', data, function(response, textStatus, jqXHR) {
-				var selection = response.decisions[options.decision];
+				if (textStatus == 'success') {
+					selection = response.decisions[options.decision];
+				}
 				if (typeof callback == 'function') {
 					callback.apply(this, [selection, response, textStatus, jqXHR])
 				}
@@ -79,15 +120,16 @@
 		// Core API
 		'send-goal': function(options, callback) {
 			// developer may override any of these defaults
-			options = $.extend({
+			var options = $.extend({
 				agent: settings.agent,
 				session: settings.session,
+				timeout: settings.timeout,
 				reward: null,
 				goal: 'goal-1'
 			}, options);
 
 			var url = constructUrl(['goal', options.goal], options);
-			var data = {apiKey: settings.apiKey};
+			var data = {apikey: settings.apiKey};
 			if (options.reward) {data.reward = options.reward};
 			if (options.session) {data.session = options.session};
 			if (options.goal) {data.goal = options.goal}
@@ -101,13 +143,14 @@
 
 		// Core API
 		'expire-session': function(options, callback) {
-			options = $.extend({
+			var options = $.extend({
 				agent: settings.agent,
-				session: settings.session
+				session: settings.session,
+				timeout: settings.timeout
 			}, options);
 
 			var url = constructUrl(['expire'], options);
-			var data = {apiKey: settings.apiKey};
+			var data = {apikey: settings.apiKey};
 			if (options.session) {data.session = options.session};
 
 			doAjax(url, 'GET', data, function(response, textStatus, jqXHR) {
@@ -161,6 +204,7 @@
 			dataType: 'json',
 			data: data,
 			success: callback,
+			error: function(jqXHR, textStatus, errorThrown) { callback(null, textStatus, jqXHR) },
 			xhrFields: {
 				withCredentials:true
 			}

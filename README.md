@@ -142,3 +142,16 @@ Given a jQuery select which matches two or more elements, shows one of the eleme
 		$('.areas-to-test-against-each-other').conductrics('choose-best')
 	})
 ```
+
+### 'redirect-to-best-url' method
+
+Given an array of URLs, redirects to one of the URLs dynamically, favoring the best-performing URL over time.
+The first URL in the list will be the "fallback" if there is a problem reaching your Conductrics agent for any reason.
+
+```javascript
+	$(function() {
+	
+		// Redirect to one of these URLs
+		$.conductrics('redirect-to-best-url', ['http://google.com', 'http://bing.com'])
+	})
+```
