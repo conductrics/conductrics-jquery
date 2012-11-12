@@ -101,8 +101,8 @@ Optionally, you may send a numeric goal value, if the goal that has just been ac
 
 ```javascript
 	// Send a reward to Conductrics when success is achieved
-	$('.demo-goal', {reward:14.99}).click(function() {
-		$.conductrics('send-goal')
+	$('.demo-goal').click(function() {
+		$.conductrics('send-goal', {reward:14.99})
 	})
 ```
 
