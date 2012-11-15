@@ -1,3 +1,4 @@
+// jQuery plugin wrapper for Conductrics API
 (function( $ ) {
 	var settings = {};
 
