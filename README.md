@@ -42,7 +42,7 @@ This plugin also provides some helpers that make it particularly easy to:
 	</script>
 ```
 
-* **Note on URLs:** You may want to keep copies of the script files (jquery.min.js and conductrics.jquery.js) on your server, along with your other page content. There's nothing wrong with using the hosted locations shown in this snippet, but we can't guarantee the availablility of the jQuery or github CDNs. *
+**Note on URLs:** *You may want to keep copies of the script files (jquery.min.js and conductrics.jquery.js) on your server, along with your other page content. There's nothing wrong with using the hosted locations shown in this snippet, but we can't guarantee the availablility of the jQuery or github CDNs.*
 
 ## Main Learning API
 
