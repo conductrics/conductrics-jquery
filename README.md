@@ -26,8 +26,8 @@ This plugin also provides some helpers that make it particularly easy to:
 3. Use the constructor function to provide your 'account owner' code and API key from Conductrics.
 
 ```html
-	<script src="jquery.js"></script>
-	<script src="conductrics.jquery.js"></script>
+	<script src="http://code.jquery.com/jquery.min.js"></script>
+	<script src="http://conductrics.github.com/conductrics-jquery/conductrics.jquery.js"></script>
 
 	<script type="text/javascript">
 		$(function() {
@@ -41,6 +41,8 @@ This plugin also provides some helpers that make it particularly easy to:
 		})
 	</script>
 ```
+
+Note: You may want to keep copies of the script files (jquery.min.js and conductrics.jquery.js) on your server, along with your other page content. There's nothing wrong with using the hosted locations shown in this snippet, but we can't guarantee the availablility of the jQuery or github CDNs.
 
 ## Main Learning API
 
