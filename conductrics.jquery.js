@@ -106,7 +106,12 @@
 			var data = {apikey: settings.apiKey};
 			if (options.session) {data.session = options.session};
 
-			var selection = {code:options.choices[0]} // if anything goes wrong, we'll fall back to this
+			// Determine fallback selection - if anything goes wrong, we'll fall back to this
+			if (typeof options.choices == 'number') {
+				var selection = {code: 0};
+			} else if (typeof options.choices.join == 'function') {
+				var selection = {code: options.choices[0]};
+			}
 
 			doAjax(url, 'GET', data, function(response, textStatus, jqXHR) {
 				if (textStatus == 'success') {
