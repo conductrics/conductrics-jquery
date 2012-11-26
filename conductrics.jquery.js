@@ -12,7 +12,7 @@
 				'apiKey': null,
 				'agent': null,
 				'session': null,
-				'timeout': 500
+				'timeout': 1000
 			}, settingz)
 
 			return this;
