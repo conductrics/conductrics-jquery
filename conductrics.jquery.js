@@ -94,7 +94,6 @@
 			var options = $.extend({
 				agent: settings.agent,
 				session: settings.session,
-				timeout: settings.timeout,
 				decision: 'decision-1',
 				choices: ['a','b']
 			}, options);
@@ -116,6 +115,10 @@
 			doAjax(url, 'GET', data, function(response, textStatus, jqXHR) {
 				if (textStatus == 'success') {
 					selection = response.decisions[options.decision];
+					alert('good ' + selection.code)
+				}
+				if (textStatus != 'success') {
+					alert('bad')
 				}
 				if (typeof callback == 'function') {
 					callback.apply(this, [selection, response, textStatus, jqXHR])
@@ -129,7 +132,6 @@
 			var options = $.extend({
 				agent: settings.agent,
 				session: settings.session,
-				timeout: settings.timeout,
 				reward: null,
 				goal: 'goal-1'
 			}, options);
@@ -151,8 +153,7 @@
 		'expire-session': function(options, callback) {
 			var options = $.extend({
 				agent: settings.agent,
-				session: settings.session,
-				timeout: settings.timeout
+				session: settings.session
 			}, options);
 
 			var url = constructUrl(['expire'], options);
@@ -202,14 +203,44 @@
 		return true;
 	}
 
+	getWorkaroundId = function() {
+		var randomElement = function(arr) {
+		  return arr[Math.floor(Math.random() * arr.length)];
+		};
+
+		var randomString = function(len, prefix) {
+		  if (prefix == null) prefix = "";
+		  while (prefix.length < len) {
+		    prefix += randomElement("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split(""));
+		  }
+		  return prefix;
+		};
+
+		var workaroundID = $.cookie('conductrics-id');
+		if (workaroundID == undefined) {
+			workaroundID = randomString(32, 'cond-');
+			$.cookie('conductrics-id', workaroundID)
+		}
+
+		return workaroundID;
+	}
+
 	// Simple wrapper around $.ajax
 	doAjax = function(url, type, data, callback) {
+		
+		// Workaround for IE 8/9 style cross-domain requests
+		if (data.session == null && window.XDomainRequest) {
+			data.session = getWorkaroundId();
+		}
+
+		//jQuery.support.cors = true;
 		$.ajax({
 			url: url, 
 			type: type,
 			dataType: 'json',
 			data: data,
 			success: callback,
+			timeout: settings.timeout,
 			error: function(jqXHR, textStatus, errorThrown) { callback(null, textStatus, jqXHR) },
 			xhrFields: {
 				withCredentials:true
@@ -228,4 +259,123 @@
 		}    
 	};
 
+})( jQuery );
+
+/*!
+ * jQuery Cookie Plugin v1.3
+ * https://github.com/carhartl/jquery-cookie
+ *
+ * Copyright 2011, Klaus Hartl
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.opensource.org/licenses/GPL-2.0
+ */
+(function ($, document, undefined) {
+
+	var pluses = /\+/g;
+
+	function raw(s) {
+		return s;
+	}
+
+	function decoded(s) {
+		return decodeURIComponent(s.replace(pluses, ' '));
+	}
+
+	var config = $.cookie = function (key, value, options) {
+
+		// write
+		if (value !== undefined) {
+			options = $.extend({}, config.defaults, options);
+
+			if (value === null) {
+				options.expires = -1;
+			}
+
+			if (typeof options.expires === 'number') {
+				var days = options.expires, t = options.expires = new Date();
+				t.setDate(t.getDate() + days);
+			}
+
+			value = config.json ? JSON.stringify(value) : String(value);
+
+			return (document.cookie = [
+				encodeURIComponent(key), '=', config.raw ? value : encodeURIComponent(value),
+				options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+				options.path    ? '; path=' + options.path : '',
+				options.domain  ? '; domain=' + options.domain : '',
+				options.secure  ? '; secure' : ''
+			].join(''));
+		}
+
+		// read
+		var decode = config.raw ? raw : decoded;
+		var cookies = document.cookie.split('; ');
+		for (var i = 0, l = cookies.length; i < l; i++) {
+			var parts = cookies[i].split('=');
+			if (decode(parts.shift()) === key) {
+				var cookie = decode(parts.join('='));
+				return config.json ? JSON.parse(cookie) : cookie;
+			}
+		}
+
+		return null;
+	};
+
+	config.defaults = {};
+
+	$.removeCookie = function (key, options) {
+		if ($.cookie(key) !== null) {
+			$.cookie(key, null, options);
+			return true;
+		}
+		return false;
+	};
+
+})(jQuery, document);
+
+(function( jQuery ) {
+
+if ( window.XDomainRequest ) {
+	jQuery.ajaxTransport(function( s ) {
+		if ( s.crossDomain && s.async ) {
+			if ( s.timeout ) {
+				s.xdrTimeout = s.timeout;
+				delete s.timeout;
+			}
+			var xdr;
+			return {
+				send: function( _, complete ) {
+					function callback( status, statusText, responses, responseHeaders ) {
+						xdr.onload = xdr.onerror = xdr.ontimeout = xdr.onprogress = jQuery.noop;
+						xdr = undefined;
+						complete( status, statusText, responses, responseHeaders );
+					}
+					xdr = new XDomainRequest();
+					xdr.open( s.type, s.url );
+					xdr.onload = function() {
+						callback( 200, "OK", { text: xdr.responseText }, "Content-Type: " + xdr.contentType );
+					};
+					xdr.onerror = function() {
+						callback( 404, "Not Found" );
+					};
+					xdr.onprogress = function() {};
+					if ( s.xdrTimeout ) {
+						xdr.ontimeout = function() {
+							callback( 0, "timeout" );
+						};
+						xdr.timeout = s.xdrTimeout;
+					}
+					xdr.send( ( s.hasContent && s.data ) || null );
+				},
+				abort: function() {
+					if ( xdr ) {
+						xdr.onerror = jQuery.noop();
+						xdr.abort();
+					}
+				}
+			};
+		}
+	});
+}
 })( jQuery );
