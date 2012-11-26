@@ -115,10 +115,6 @@
 			doAjax(url, 'GET', data, function(response, textStatus, jqXHR) {
 				if (textStatus == 'success') {
 					selection = response.decisions[options.decision];
-					alert('good ' + selection.code)
-				}
-				if (textStatus != 'success') {
-					alert('bad')
 				}
 				if (typeof callback == 'function') {
 					callback.apply(this, [selection, response, textStatus, jqXHR])
@@ -204,6 +200,8 @@
 	}
 
 	getWorkaroundId = function() {
+		var alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split("");
+
 		var randomElement = function(arr) {
 		  return arr[Math.floor(Math.random() * arr.length)];
 		};
@@ -211,7 +209,7 @@
 		var randomString = function(len, prefix) {
 		  if (prefix == null) prefix = "";
 		  while (prefix.length < len) {
-		    prefix += randomElement("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split(""));
+		    prefix += randomElement(alphabet);
 		  }
 		  return prefix;
 		};
@@ -233,7 +231,6 @@
 			data.session = getWorkaroundId();
 		}
 
-		//jQuery.support.cors = true;
 		$.ajax({
 			url: url, 
 			type: type,

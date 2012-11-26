@@ -9,14 +9,17 @@
 	// Initialize plugin
 	$.conductrics({
 		owner: 'nate',
-		apiKey: '123',
-		agent: 'jquery-example-3'
+		apiKey: 'UKICgZRAnfTwnePY',
+		agent: 'jquery-example-3xab',
+		baseUrl: 'http://test1.conductrics.net:81'
 	})
 
 	$(document).ready(function() {
 
 		// Get a decision from Conductrics
-		$.conductrics('get-decision', {choices:['a', 'b']}, function(selection) {
+		$.conductrics('get-decision', {choices:['a','b']}, function(selection) {
+			alert(selection.code)
+
 			switch (selection.code) {
 				case 'a':
 					// do something!
