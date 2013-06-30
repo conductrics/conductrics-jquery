@@ -163,20 +163,20 @@ The first URL in the list will be the "fallback" if there is a problem reaching 
 
 Given a jQuery select which matches two or more elements, runs simple "show/hide" tests. This is nice in a scenario where it is easy to add a few 'data' attributes to your markup (or have a CMS add them, etc).
 
-Suggested usage is to define a CSS class which hides the elements initially (here we use 'conductrics-experience' for clarity).
+Suggested usage is to define a CSS class which hides the elements initially (here we use 'conductrics-experience' for clarity). You can define the class in an inline style block, or in an external CSS stylesheet file. It should be in the head of your document:
 
 ```css
 .conductrics-experience {display:none}
 ```
 
-Now provide an agent code and choice code on the page elements you would like to test against each other. Use the same agent code, but a different choice code, for each item in the set. You can use multiple agent codes if there are multiple conceptual tests to run on the page.
+Now provide an agent code and choice code on the page elements you would like to test against each other. Use the same agent code, but a different choice code, for each item in the set. (The agent and choice codes do not have to be set up first on the Conductrics side; they will be created automatically the first time they are encountered.) For example:
 
 ```html
-<div class='conductrics-experience' data-agent="my-agent-code" data-choice="experience-a">
+<div class='conductrics-experience' data-conductrics-agent="my-agent-code" data-conductrics-choice="experience-a">
   Cool, my glass is half-full!
 </div>
 
-<div class='conductrics-experience' data-agent="my-agent-code" data-choice="experience-b">
+<div class='conductrics-experience' data-conductrics-agent="my-agent-code" data-conductrics-choice="experience-b">
   Shoot, my glass is half-empty.
 </div>
 ```
@@ -184,7 +184,21 @@ Now provide an agent code and choice code on the page elements you would like to
 And then, at the bottom of the page (no need to wait for document.ready, though you may if you wish):
 
 ```javascript
-		// Have Conductrics run test(s) for each set of elements marked with the appropriate attributes (if any)
-		$('.conductrics-selection').conductrics('autowire');
-	})
+// Have Conductrics run test(s) for each set of elements marked with the appropriate attributes (if any)
+$('.conductrics-selection').conductrics('autowire');
 ```
+
+If you are just deciding whether to show or hide something, you can use the same markup style. Just use an empty element to represent the 'hidden' experience. You might want to use choice codes such as 'visible' and 'hidden' for clarity:
+
+```html
+<div class='conductrics-experience' data-conductrics-agent="my-visibility-agent" data-conductrics-choice="visible">
+  This is something that I want to show to some visitors.
+</div>
+<div class='conductrics-experience' data-conductrics-agent="my-visibility-agent" data-conductrics-choice="hidden" />
+```
+
+A few additional notes:
+* You can use multiple agent codes if there are multiple conceptual tests to run on the page. So, you could have two divs that use data-conductrics-agent="agent-1" and another set of divs that use data-conductrics-agent="agent-2". (At this time, they will be run as separate tests--let us know if you'd like this method to support MVT style test experiments.)
+* There need to be at least two choices (two divs or whatever) for any given agent code. If there is only one, the plugin does nothing for that agent code.
+* Your agent and choice codes should contain only letters, numbers, and dashes--don't use spaces or other special characters.
+* You don't have to use div elements to contain the content you want to test; you can put the data attributes on whatever HTML elements make sense for your pages. We just used divs in these notes for simplicity's sake.
