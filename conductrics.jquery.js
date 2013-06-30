@@ -77,7 +77,7 @@
 			options.choices = urls.length;
 
 			var selectedUrl = urls[0]; // in case anything goes wrong, we'll fall back to this
-			
+
 			methods['get-decision'](options, function(selection) {
 				if (selection.code != null) {
 					selectedUrl = urls[selection.code];
@@ -86,6 +86,24 @@
 			});
 
 			return this;
+		},
+
+		// Simple Helper API
+		'autowire': function(optionz, callback) {
+			var $this = $(this).hide();
+			// developer may override any of these defaults
+			var options = $.extend({}, optionz);
+			var agentData = findAutowirableAgents($this.selector);
+			for (var agentCode in agentData) {
+				(function(code, data) {
+					if (data && data.choices && data.choices.length >= 2) {
+						$.conductrics('get-decision', {agent:code, choices:data.choices.join(',')}, function(selection) {
+							var sel = $this.selector + '[data-conductrics-agent="'+code+'"][data-conductrics-choice="' +selection.code+ '"]';
+							$(sel).show();
+						});
+					}
+				})(agentCode, agentData[agentCode]);
+			}
 		},
 
 		// Core API
@@ -223,16 +241,31 @@
 		return workaroundID;
 	}
 
+	findAutowirableAgents = function(selector) {
+		var agents = {};
+		$(selector).each(function() {
+			var agent = $(this).attr('data-conductrics-agent');
+			var choice = $(this).attr('data-conductrics-choice');
+			if (agent && choice) {
+				if (!agents[agent]) {
+					agents[agent] = {choices:[]}
+				}
+				agents[agent].choices.push(choice);
+			}
+		});
+		return agents;
+	}
+
 	// Simple wrapper around $.ajax
 	doAjax = function(url, type, data, callback) {
-		
+
 		// Workaround for IE 8/9 style cross-domain requests
 		if (data.session == null && window.XDomainRequest) {
 			data.session = getWorkaroundId();
 		}
 
 		$.ajax({
-			url: url, 
+			url: url,
 			type: type,
 			dataType: 'json',
 			data: data,
@@ -253,7 +286,7 @@
 			return methods.init.apply( this, arguments );
 		} else {
 			$.error( 'Method ' +  method + ' does not exist on jQuery.conductrics' );
-		}    
+		}
 	};
 
 })( jQuery );
