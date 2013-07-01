@@ -246,14 +246,30 @@
 		$(selector).each(function() {
 			var agent = $(this).attr('data-conductrics-agent');
 			var choice = $(this).attr('data-conductrics-choice');
-			if (agent && choice) {
+			// agent is required
+			if (validCode(agent)) {
 				if (!agents[agent]) {
 					agents[agent] = {choices:[]}
+				}
+				var choices = agents[agent].choices;
+				if (!validCode(choice)) {
+					choice = 'experience-' + 'abcdefghijklmnopqrstuvwxyz'[choices.length];
+					$(this).attr('data-conductrics-choice', choice);
 				}
 				agents[agent].choices.push(choice);
 			}
 		});
+		for (var code in agents) {
+			// if there is only one option, assume intent is to test it against "nothing"
+			if (agents[code].choices.length == 1) {
+				agents[code].choices.push('nothing');
+			}
+		}
 		return agents;
+	}
+
+	validCode = function(s) {
+		return s != null && s.length > 0 && s.length < 25 && !(/[^0-9A-Za-z_-]/).test(s)
 	}
 
 	// Simple wrapper around $.ajax

@@ -169,14 +169,14 @@ Suggested usage is to define a CSS class which hides the elements initially (her
 .conductrics-experience {display:none}
 ```
 
-Now provide an agent code and choice code on the page elements you would like to test against each other. Use the same agent code, but a different choice code, for each item in the set. (The agent and choice codes do not have to be set up first on the Conductrics side; they will be created automatically the first time they are encountered.) For example:
+Now provide an agent code on the page elements you would like to test against each other. Make up an agent code and add it as an attribute to both elements as shown here (you don't have to register the agent code first on the Conductrics side).
 
 ```html
-<div class='conductrics-experience' data-conductrics-agent="my-agent-code" data-conductrics-choice="experience-a">
+<div class='conductrics-experience' data-conductrics-agent="my-agent-code">
   Cool, my glass is half-full!
 </div>
 
-<div class='conductrics-experience' data-conductrics-agent="my-agent-code" data-conductrics-choice="experience-b">
+<div class='conductrics-experience' data-conductrics-agent="my-agent-code">
   Shoot, my glass is half-empty.
 </div>
 ```
@@ -188,17 +188,33 @@ And then, at the bottom of the page (no need to wait for document.ready, though 
 $('.conductrics-selection').conductrics('autowire');
 ```
 
-If you are just deciding whether to show or hide something, you can use the same markup style. Just use an empty element to represent the 'hidden' experience. You might want to use choice codes such as 'visible' and 'hidden' for clarity:
+When the page is viewed, the agent will select between the two pieces of content, and make the selected one visible (the other will remain hidden per the CSS style).
+
+#### Providing meaningful choice codes
+If you look at reporting for the agent in the Conductrics Console, you'll notice that the two elements have been given default names ('experience-a' and 'experience-b'). You can rename them in the console, but you may want to give them more meaningful codes (unique names) from the outset as shown here:
 
 ```html
-<div class='conductrics-experience' data-conductrics-agent="my-visibility-agent" data-conductrics-choice="visible">
-  This is something that I want to show to some visitors.
+<div class='conductrics-experience' data-conductrics-agent="my-agent-code" data-conductrics-choice="positive">
+  Cool, my glass is half-full!
 </div>
-<div class='conductrics-experience' data-conductrics-agent="my-visibility-agent" data-conductrics-choice="hidden" />
+
+<div class='conductrics-experience' data-conductrics-agent="my-agent-code" data-conductrics-choice="negative">
+  Shoot, my glass is half-empty.
+</div>
 ```
+
+#### Autowire shorthand for showing and hiding
+If you are just deciding whether to show or hide something, you can use the same markup style on a single element.
+
+```html
+<div class='conductrics-experience' data-conductrics-agent="my-visibility-agent" data-conductrics-choice="show">
+  This is something that I want to try showing to some visitors--the other visitors should see nothing.
+</div>
+```
+
+You can provide a choice code as shown above, or you can accept the default of 'option-1'. A second option called 'nothing' will be created automatically. At runtime, the agent will decide between showing the content, and the 'nothing' option, which will not make anything visible.
 
 A few additional notes:
 * You can use multiple agent codes if there are multiple conceptual tests to run on the page. So, you could have two divs that use data-conductrics-agent="agent-1" and another set of divs that use data-conductrics-agent="agent-2". (At this time, they will be run as separate tests--let us know if you'd like this method to support MVT style test experiments.)
-* There need to be at least two choices (two divs or whatever) for any given agent code. If there is only one, the plugin does nothing for that agent code.
 * Your agent and choice codes should contain only letters, numbers, and dashes--don't use spaces or other special characters.
 * You don't have to use div elements to contain the content you want to test; you can put the data attributes on whatever HTML elements make sense for your pages. We just used divs in these notes for simplicity's sake.
