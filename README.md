@@ -207,12 +207,12 @@ If you look at reporting for the agent in the Conductrics Console, you'll notice
 If you are just deciding whether to show or hide something, you can use the same markup style on a single element.
 
 ```html
-<div class='conductrics-experience' data-conductrics-agent="my-visibility-agent" data-conductrics-choice="show">
+<div class='conductrics-experience' data-conductrics-agent="my-agent-2" data-conductrics-choice="special-stuff">
   This is something that I want to try showing to some visitors--the other visitors should see nothing.
 </div>
 ```
 
-You can provide a choice code as shown above, or you can accept the default of 'option-1'. A second option called 'nothing' will be created automatically. At runtime, the agent will decide between showing the content, and the 'nothing' option, which will not make anything visible.
+You can provide a choice code as shown above, or you can accept the default of 'experience-a' as discussed above. A second option called 'nothing' will be created automatically. At runtime, the agent will decide between showing the content, and the 'nothing' option, which will not make anything visible.
 
 A few additional notes:
 * You can use multiple agent codes if there are multiple conceptual tests to run on the page. So, you could have two divs that use data-conductrics-agent="agent-1" and another set of divs that use data-conductrics-agent="agent-2". (At this time, they will be run as separate tests--let us know if you'd like this method to support MVT style test experiments.)
