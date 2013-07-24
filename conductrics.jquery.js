@@ -92,7 +92,7 @@
 		'autowire': function(optionz, callback) {
 			var $this = $(this).hide();
 			// developer may override any of these defaults
-			var options = $.extend({}, optionz);
+			var options = $.extend({autoReward:true}, optionz);
 			var agentData = findAutowirableAgents($this.selector);
 			for (var agentCode in agentData) {
 				(function(code, data) {
@@ -103,6 +103,25 @@
 						});
 					}
 				})(agentCode, agentData[agentCode]);
+			}
+			if (options.autoReward) {
+				rewards = $('body').attr('data-conductrics-reward-onload');
+				if (rewards) {
+					rewards = rewards.split(',');
+					for (var i in rewards) {
+						var parts = rewards[i].split(':');
+						if (parts.length >= 1) {
+							goalOptions = {
+								agent: parts[0],
+								goal: parts[1],  // might be undefined - will default to 'goal-1' downstream
+								reward: parts[2] // might be undefined - will default to 1 downstream
+							};
+							$.conductrics('send-goal', goalOptions, function() {
+								complain('reward sent for ', goalOptions);
+							});
+						}
+					}
+				}
 			}
 		},
 
@@ -154,7 +173,6 @@
 			var data = {apikey: settings.apiKey};
 			if (options.reward) {data.reward = options.reward};
 			if (options.session) {data.session = options.session};
-			if (options.goal) {data.goal = options.goal}
 
 			doAjax(url, 'POST', data, function(response, textStatus, jqXHR) {
 				if (typeof callback == 'function') {
@@ -201,8 +219,10 @@
    	}
 
    	// For error messaging
-	complain = function(str) {
-		console.log(str);
+	complain = function() {
+		if (console && console.log) {
+			console.log(arguments);
+		}
 	}
 
 	// Basic validation
