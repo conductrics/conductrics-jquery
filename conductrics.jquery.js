@@ -94,10 +94,12 @@
 			// developer may override any of these defaults
 			var options = $.extend({autoReward:true}, optionz);
 			var agentData = findAutowirableAgents($this.selector);
+
+			var features = $('body').attr('data-conductrics-features');
 			for (var agentCode in agentData) {
 				(function(code, data) {
 					if (data && data.choices && data.choices.length >= 2) {
-						$.conductrics('get-decision', {agent:code, choices:data.choices.join(',')}, function(selection) {
+						$.conductrics('get-decision', {agent:code, choices:data.choices.join(','), features:features}, function(selection) {
 							var sel = $this.selector + '[data-conductrics-agent="'+code+'"][data-conductrics-choice="' +selection.code+ '"]';
 							$(sel).show();
 						});
@@ -141,6 +143,9 @@
 			var url = constructUrl(['decisions', options.choices.toString()], options);
 			var data = {apikey: settings.apiKey};
 			if (options.session) {data.session = options.session};
+			if (options.features) {
+				data.features = sanitizeCodesStr(options.features);
+			}
 
 			// Determine fallback selection - if anything goes wrong, we'll fall back to this
 			if (typeof options.choices == 'number') {
@@ -290,6 +295,22 @@
 
 	validCode = function(s) {
 		return s != null && s.length > 0 && s.length < 25 && !(/[^0-9A-Za-z_-]/).test(s)
+	}
+
+	sanitizeCodesStr = function(str) {
+		if (!str) return "";
+		return sanitizeCodes(str.split(',')).join(',');
+	}
+
+	sanitizeCodes = function(codes) {
+		if (!codes) return [];
+		result = [];
+		for (var i in codes) {
+			if (validCode(codes[i])) {
+				result.push(codes[i]);
+			}
+		}
+		return result;
 	}
 
 	// Simple wrapper around $.ajax
