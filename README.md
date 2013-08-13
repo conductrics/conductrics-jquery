@@ -43,6 +43,8 @@ This plugin also provides some helpers that make it particularly easy to:
 	</script>
 ```
 
+**Passing a Session Identifier:** *If you have a value that you would like to use as the session id that Conductrics uses internally, pass that as an an additional argument called "session" to the init function, at the same level as owner, agent, etc. For instance, you might have the visitor id in a cookie that is accessible via JavaScript; if so, you would add something like `session: $.cookie('visitorId')` to the code snippet above. See http://console.conductrics.com/docs/sessions for info about Conductrics sessions.*
+
 **Note on URLs:** *You may want to keep copies of the script files (jquery.min.js and conductrics.jquery.js) on your server, along with your other page content. There's nothing wrong with using the hosted locations shown in this snippet, but we can't guarantee the availablility of the jQuery or github CDNs.*
 
 ## Main Learning API
