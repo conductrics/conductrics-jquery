@@ -115,7 +115,7 @@ Optionally, you may send a numeric goal value, if the goal that has just been ac
 
 ### expire-session
 
-This is often not needed at all, but if your site or app is such that your users or visitors will have a way to explicity 'log out' or 'exit', you can let the Conductrics service know. This will close out the user's session, cause the Conductrics service to ignore any subsequent goals, and make them eligible to get a different choice shoudl they re-encounter the same agent.
+This is often not needed at all, but if your site or app is such that your users or visitors will have a way to explicity 'log out' or 'exit', you can let the Conductrics service know. This will close out the user's session, cause the Conductrics service to ignore any subsequent goals, and make them eligible to get a different choice should they re-encounter the same agent.
 
 ```javascript
 	// Send a reward to Conductrics when success is achieved
