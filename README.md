@@ -235,8 +235,8 @@ Required:
 Optional:
 
 + `timeout` - an HTTP request timeout, in milliseconds -- the default is 1000 (one second).
-+ `agent` - an agent code for making decisions, sending rewards, etc -- the agent does not have to exist already on the server. Alternatively, you can pass an agent code to individual calls to `get-decision`, `send-reward`, which will take precedence over an agent code provided to init().
-+ `session` - a session identifier, if you want to provide your own -- if not provided, the Conductrics server will maintain its own session ID (see http://console.conductrics.com/docs/sessions). You can also pass a session code to individual calls to `get-decision`, `send-reward`, which will take precedence over a session code provided to init().
++ `agent` - an agent code for making decisions, sending rewards, etc -- the agent does not have to exist already on the server. Alternatively, you can pass an agent code to individual calls to get-decision, send-reward, and so on, which will take precedence over a code provided to the constructor.
++ `session` - a session identifier, if you want to provide your own -- if not provided, the Conductrics server will maintain its own session ID (see http://console.conductrics.com/docs/sessions). You can also pass a session code to individual calls to get-decision, send-reward, and so on, which will take precedence over a code provided to the constructor.
 + `baseUrl` - the Conductrics server to communicate with -- the default is `https://api.conductrics.com` which is typically correct.
 + `caching` - if set to `localStorage`, the plugin will cache decisions using the HTML5 localStorage API if available, which means that the plugin will not go back to the server repeatedly to get a decision (for a given agent and session).
 + `cachingMaxAge` - the maximum amount of time to store cached decisions locally, expressed in seconds -- the default is 1800 (30 minutes).
