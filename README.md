@@ -43,6 +43,8 @@ This plugin also provides some helpers that make it particularly easy to:
 	</script>
 ```
 
+See the [Options][] section below for additional options that can be provided to the constructor.
+
 **Passing a Session Identifier:** *If you have a value that you would like to use as the session id that Conductrics uses internally, pass that as an an additional argument called "session" to the init function, at the same level as owner, agent, etc. For instance, you might have the visitor id in a cookie that is accessible via JavaScript; if so, you would add something like `session: $.cookie('visitorId')` to the code snippet above. See http://console.conductrics.com/docs/sessions for info about Conductrics sessions.*
 
 **Note on URLs:** *You may want to keep copies of the script files (jquery.min.js and conductrics.jquery.js) on your server, along with your other page content. There's nothing wrong with using the hosted locations shown in this snippet, but we can't guarantee the availablility of the jQuery or github CDNs.*
@@ -121,6 +123,24 @@ This is often not needed at all, but if your site or app is such that your users
 		$.conductrics('expire-session')
 	})
 ```
+
+## Options
+
+These options can be passed to the constructor method (see the example up top).
+
+Required:
+
++ `owner` - your account 'owner code', from your Conductrics account.
++ `apiKey` - your Runtime API key, from your Conductrics account.
+
+Optional:
+
++ `timeout` - an HTTP request timeout, in milliseconds -- the default is 1000 (one second).
++ `agent` - an agent code for making decisions, sending rewards, etc -- the agent does not have to exist already on the server. Alternatively, you can pass an agent code to individual calls to `get-decision`, `send-reward`, which will take precedence over an agent code provided to init().
++ `session` - a session identifier, if you want to provide your own -- if not provided, the Conductrics server will maintain its own session ID (see http://console.conductrics.com/docs/sessions). You can also pass a session code to individual calls to `get-decision`, `send-reward`, which will take precedence over a session code provided to init().
++ `baseUrl` - the Conductrics server to communicate with -- the default is `https://api.conductrics.com` which is typically correct.
++ `caching` - if set to `localStorage`, the plugin will cache decisions using the HTML5 localStorage API if available, which means that the plugin will not go back to the server repeatedly to get a decision (for a given agent and session).
++ `cachingMaxAge` - the maximum amount of time to store cached decisions locally, expressed in seconds -- the default is 1800 (30 minutes).
 
 ## Helper Methods
 
