@@ -12,8 +12,12 @@
 				'apiKey': null,
 				'agent': null,
 				'session': null,
-				'timeout': 1000
+				'timeout': 1000,
+				'caching': false, // set to 'localStorage' to enable local decision cache
+				'cachingMaxAge': (30*60), // used only if caching enabled, expressed in seconds
 			}, settingz)
+
+			storageMaintain();
 
 			return this;
 		},
@@ -44,7 +48,7 @@
 			for (var i in options.helpers) {
 				var helper = options.helpers[i];
 				if (helper.selector && helper.helper && helper.options) {
-					if (['toggle','choose-best'].indexOf(helper.helper) >= 0) {
+					if ($.inArray(helper.helper, ['toggle','choose-best']) >= 0) {
 						// hmm, we want to call toggle() or whatever, but we don't want to get the decision again...
 					}
 				}
@@ -138,7 +142,7 @@
 			}, options);
 
 			if (!ensure(options, ['agent'])) { return }; // Bail if we don't have enough info
-			if (!ensure(settings, ['baseUrl', 'apiKey'])) { return }; // Bail if we don't have enough info
+			if (!ensure(settings, ['baseUrl', 'owner', 'apiKey'])) { return }; // Bail if we don't have enough info
 
 			var url = constructUrl(['decisions', options.choices.toString()], options);
 			var data = {apikey: settings.apiKey};
@@ -148,18 +152,34 @@
 			}
 
 			// Determine fallback selection - if anything goes wrong, we'll fall back to this
+			var selection;
 			if (typeof options.choices == 'number') {
-				var selection = {code: 0};
-			} else if (typeof options.choices.join == 'function') {
-				var selection = {code: options.choices[0]};
+				selection = {code: 0};
+			} else if (typeof options.choices.join == 'function') { // it's an array
+				selection = {code: options.choices[0]};
+			}
+
+			if (settings.caching) {
+				var decisions = storageRead(options, 'dec');
+				if (decisions && decisions[options.decision]) {
+					selection = decisions[options.decision];
+					if (typeof callback == 'function') {
+						callback.apply(this, [selection, null, 'stored', null]);
+						return;
+					}
+				}
 			}
 
 			doAjax(url, 'GET', data, function(response, textStatus, jqXHR) {
 				if (textStatus == 'success') {
 					selection = response.decisions[options.decision];
+					if (settings.caching && selection) {
+						storageWrite(options, 'dec', response.decisions);
+						console.log('write', response.decisions);
+					}
 				}
 				if (typeof callback == 'function') {
-					callback.apply(this, [selection, response, textStatus, jqXHR])
+					callback.apply(this, [selection, response, textStatus, jqXHR]);
 				}
 			})
 		},
@@ -311,6 +331,69 @@
 			}
 		}
 		return result;
+	}
+
+	supportsHtmlLocalStorage = function() {
+		if (settings.caching != 'localStorage') return false;
+		try {
+			return 'localStorage' in window && window['localStorage'] !== null;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	storageKey = function(options, name) {
+		var ar = [];
+		var ks = ['baseUrl', 'owner', 'agent', 'session'];
+		for (var i in ks) {
+			if (options[ks[i]] != null) {
+				ar.push(options[ks[i]]);
+			} else if (settings[ks[i]] != null) {
+				ar.push(settings[ks[i]]);
+			}
+		}
+		if (name) { ar.push(name) }
+		return ar.join(':');
+	}
+
+	storageRead = function(options, name, defaultValue) {
+		if (!supportsHtmlLocalStorage()) {return defaultValue};
+		var store = localStorage;
+		var key = storageKey(options, name);
+		var stored = store.getItem(key);
+		if (stored) {
+			var record = JSON.parse(stored);
+			if (record.val) {
+				return record.val;
+			}
+		}
+		return defaultValue;
+	}
+
+	storageWrite = function(options, name, value) {
+		if (!supportsHtmlLocalStorage()) {return};
+		var store = localStorage;
+		var key = storageKey(options, name);
+		var record = {ts:new Date().getTime(), val:value};
+		store.setItem(key, JSON.stringify(record));
+	}
+
+	storageMaintain = function() {
+		if (!supportsHtmlLocalStorage()) {return};
+		var store = localStorage;
+		for (var i = 0; i < store.length; i++) {
+			var key = store.key(i);
+			if (key.indexOf([settings.baseUrl, settings.owner].join(':')) == 0) { // clean expired info for this server and owner
+				var stored = store.getItem(key);
+				if (stored) {
+					var record = JSON.parse(stored);
+					if (record.ts && (record.ts + (settings.cachingMaxAge * 1000)) < new Date().getTime()) {
+						store.removeItem(key);
+						console.log('removed key', key);
+					}
+				}
+			}
+		}
 	}
 
 	// Simple wrapper around $.ajax
