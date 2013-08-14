@@ -18,7 +18,7 @@ This plugin also provides some helpers that make it particularly easy to:
 
 + **Run "Tests" that show or hide parts of a page**, based on a jQuery selector. Useful in situations where you have some kind of content that you want to show or hide based on how well users respond to it.
 + **Run "Tests" that select from a list of elements on a page,** based on items matched by a jQuery selector. Useful in situations where you have a few different content experiences, and you want Conductrics to select the one that has been proven to be most effective.
-+ **"Autowire" elements on a page, using special 'data-conductrics' attributes in the markup.
++ **"Autowire" elements on a page,** using special 'data-conductrics' attributes in the markup.
 
 ## Getting Set Up
 
