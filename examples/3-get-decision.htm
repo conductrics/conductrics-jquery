@@ -8,17 +8,19 @@
 <script type="text/javascript">
 	// Initialize plugin
 	$.conductrics({
-		owner: 'nate',
-		apiKey: 'UKICgZRAnfTwnePY',
-		agent: 'jquery-example-3xab',
-		baseUrl: 'http://test1.conductrics.net:81'
+		owner: 'owner_sxvgyHUlj',
+		apiKey: 'api-nQyALpnyPsZHQrVbvtOhZpYz',
+		agent:'jquery-example-3',
+		baseUrl: 'http://test.conductrics.com:81',
+		caching: true,
+		session: '{123-{-}-45abc}',
 	})
 
 	$(document).ready(function() {
 
 		// Get a decision from Conductrics
 		$.conductrics('get-decision', {choices:['a','b']}, function(selection) {
-			alert(selection.code)
+			console.log(selection.code)
 
 			switch (selection.code) {
 				case 'a':
