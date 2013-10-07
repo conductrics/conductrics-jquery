@@ -7,7 +7,7 @@
 		// Initialize with base settings
 		init : function(settingz) {
 			// developer may override any of these defaults
-			settings = $.extend({
+			settings = $.extend(true, {
 				'baseUrl': 'http://api.conductrics.com',
 				'apiKey': null,
 				'agent': null,
@@ -15,6 +15,17 @@
 				'timeout': 1000,
 				'caching': false, // set to 'localStorage' to enable local decision cache
 				'cachingMaxAge': (30*60), // used only if caching enabled, expressed in seconds
+				// Explicit cookie support - not needed in recent versions of jQuery, but required in 1.4-era jQuery
+				// Ignored if a session identifier is provided explicitly (above)
+				'sessionCookies': false, // set to true to forcibly store the session id returned by Conductrics as a cookie
+				'sessionCookieName': 'mpid', // Name of 'mpid' is recommended
+				'sessionCookieOptions': {
+					// can specify 'domain', 'expires', 'path', and other options as explained here: https://github.com/carhartl/jquery-cookie
+					// The most important options are:
+					// expires: 30, // number of days that the session id should be retained - if not specified, cookie is discarded when browser closed
+					// domain: '.example.com', // a top-level domain, within which the cookie may be shared - so a value of '.example.com' here will allow Conductrics tracking to work between say 'www.example.com' and 'store.example.com'
+					path: '/'
+				}
 			}, settingz)
 
 			storageMaintain();
@@ -146,7 +157,7 @@
 
 			var url = constructUrl(['decisions', options.choices.toString()], options);
 			var data = {apikey: settings.apiKey};
-			if (options.session) {data.session = options.session};
+			if (options.session != null) {data.session = options.session};
 			if (options.features) {
 				data.features = sanitizeCodesStr(options.features);
 			}
@@ -175,7 +186,6 @@
 					selection = response.decisions[options.decision];
 					if (settings.caching && selection) {
 						storageWrite(options, 'dec', response.decisions);
-						console.log('write', response.decisions);
 					}
 				}
 				if (typeof callback == 'function') {
@@ -389,7 +399,6 @@
 					var record = JSON.parse(stored);
 					if (record.ts && (record.ts + (settings.cachingMaxAge * 1000)) < new Date().getTime()) {
 						store.removeItem(key);
-						console.log('removed key', key);
 					}
 				}
 			}
@@ -399,9 +408,22 @@
 	// Simple wrapper around $.ajax
 	doAjax = function(url, type, data, callback) {
 
+		// Local cookie support, if enabled
+		if (data.session == null && settings.sessionCookies) {
+			var storedId = $.cookie(settings.sessionCookieName);
+			if (storedId) {
+				data.session = storedId;
+			}
+		}
+
 		// Workaround for IE 8/9 style cross-domain requests
 		if (data.session == null && window.XDomainRequest) {
 			data.session = getWorkaroundId();
+		}
+
+		// If we still have a null session id, don't send one at all (don't send 'null')
+		if (data.session == null) {
+			delete data.session;
 		}
 
 		$.ajax({
@@ -409,9 +431,22 @@
 			type: type,
 			dataType: 'json',
 			data: data,
-			success: callback,
 			timeout: settings.timeout,
-			error: function(jqXHR, textStatus, errorThrown) { callback(null, textStatus, jqXHR) },
+			success: function(data, textStatus, jqXHR) {
+				// Local cookie support, if enabled
+				if (settings.sessionCookies && data != null && data.session != null) {
+					$.cookie(settings.sessionCookieName, data.session, settings.sessionCookieOptions);
+				}
+				// Notify callback
+				if (typeof(callback) == 'function') {
+					callback(data, textStatus, jqXHR);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if (typeof(callback) == 'function') {
+					callback(null, textStatus, jqXHR)
+				}
+			},
 			xhrFields: {
 				withCredentials:true
 			}
