@@ -1,6 +1,6 @@
 # jQuery Plugin for Conductrics
 
-This is a jQuery plugin for the Conductrics service, which provides an API for bandit-style optimization, dynamic targeting, and A/B testing. We'll assume here that you are at familiar with the basic idea of the service. If not, please see http://www.conductrics.com for information about the service itself. Thanks!
+This is a jQuery plugin for the Conductrics service, which provides an API for bandit-style optimization, dynamic targeting, and A/B testing. We'll assume here that you are familiar with the basic idea of the service. If not, please see http://www.conductrics.com for information about the service itself. Thanks!
 
 ## What This Plugin Does
 
@@ -241,5 +241,7 @@ Optional:
 + `baseUrl` - the Conductrics server to communicate with -- the default is `https://api.conductrics.com` which is typically correct.
 + `caching` - if set to `localStorage`, the plugin will cache decisions using the HTML5 localStorage API if available, which means that the plugin will not go back to the server repeatedly to get a decision (for a given agent and session).
 + `cachingMaxAge` - the maximum amount of time to store cached decisions locally, expressed in seconds -- the default is 1800 (30 minutes).
-+ `sessionCookies` - Set to `true` to have the plugin store the session identifier returned by Conductrics as a cookie. Not generally needed with recent versions of jQuery (1.6+), but required if using 1.4-era jQuery. Ignored if a `session` value is supplied (see above).
-+ `sessionCookieOptions` - You can use this to specify 'domain', 'expires', 'path', and other [Cookie Options](https://github.com/carhartl/jquery-cookie) provided by the jquery-cookie plugin, which is included here. In particular you might want to set a `domain` option, if your Conductrics experiments span multiple subdomains with a single top-level domain (for instance, you might use '.example.com' if an agent is running at both 'www.example.com' and 'store.example.com'). You may also want to set an `expires` option if you want Conductrics to track users between browser sessions -- by default the identifier is discarded when the browser closes.
++ `sessionCookies` - Set to `true` to have the plugin store the session identifier returned by Conductrics as a cookie. Not generally needed with recent versions of jQuery (1.6+), but required if using 1.4-era jQuery. **Ignored** if a `session` value is supplied (see above).
++ `sessionCookieOptions` - You can provide a nested object here to specify 'domain', 'expires', 'path', and other [Cookie Options](https://github.com/carhartl/jquery-cookie#cookie-options) provided by [jquery-cookie](https://github.com/carhartl/jquery-cookie), which is used internally.
+	+ In particular you might want to set a `domain` option, if your Conductrics experiments span multiple subdomains with a single top-level domain (for instance, you might use `.example.com` if an agent is running at both *www.example.com* and *store.example.com*).
+	+ You may also want to set an `expires` option if you want Conductrics to track users between browser sessions, such as `expires:30` to keep the same session identifier for 30 days (by default the identifier is discarded when the browser closes).
