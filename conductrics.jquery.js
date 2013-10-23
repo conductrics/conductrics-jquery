@@ -149,7 +149,8 @@
 				agent: settings.agent,
 				session: settings.session,
 				decision: 'decision-1',
-				choices: ['a','b']
+				choices: ['a','b'],
+				point: null
 			}, options);
 
 			if (!ensure(options, ['agent'])) { return }; // Bail if we don't have enough info
@@ -161,6 +162,9 @@
 			if (options.features) {
 				data.features = sanitizeCodesStr(options.features);
 			}
+			if (typeof options.point == 'string') {
+				data.point = sanitizeCodesStr(options.point);
+			}
 
 			// Determine fallback selection - if anything goes wrong, we'll fall back to this
 			var selection;
@@ -169,6 +173,7 @@
 			} else if (typeof options.choices.join == 'function') { // it's an array
 				selection = {code: options.choices[0]};
 			}
+
 
 			if (settings.caching) {
 				var decisions = storageRead(options, 'dec');
