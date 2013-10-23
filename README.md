@@ -89,7 +89,21 @@ The most important property of this object is **choices**, which you can use to 
 
 2. A callback function which will receive the selection from the Conductrics service. The selection will be an object that has a **code** property, which will be one of the strings that were provided as options (so, in this example, you can expect selection.code to be either "big" or "small").
 
-Your options object can also include a `point` property, if you wish to use Conductrics decision points (see http://console.conductrics.com/docs/demo/multiples) to enable 'intelligent attribution' in relatively complex scenarios. The `point` option can be provided when calling get-decision, or can be provided to the constructor.
+##### Additional get-decision options:
+
+You can provide additional options to get-decision for advanced scenarios with multiple decisions (please refer to http://console.conductrics.com/docs/demo/multiples for an overview of what Conductrics provides to help you work with multiple decisions):
+
+1. Your options object can specify a `point` property, if you wish to use Conductrics decision points  to enable 'intelligent attribution' in relatively complex scenarios. The `point` option can be provided when calling get-decision, or can be provided to the constructor.
+
+2. To handle multiple decisions at a single decision point (multivariate-style selection), your options object can specify a `choices` property as an object, rather than a simple array. Each key in the choices object is a decision code, and the value of that key should be an array of the option codes for that decision. For instance:
+
+```javascript
+$.conductrics('get-decision', { choices: {size:['big', 'small'], color:['red','yellow','blue']} }, function(selection) {
+	// do whatever you want with the size and color properties of the returned selection
+	console.log(selection.size);
+	console.log(selection.color);
+}
+```
 
 ### 'send-goal' method
 

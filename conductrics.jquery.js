@@ -148,7 +148,7 @@
 			var options = $.extend({
 				agent: settings.agent,
 				session: settings.session,
-				decision: 'decision-1',
+				decision: null, // undocumented/legacy
 				choices: ['a','b'],
 				point: null
 			}, options);
@@ -156,7 +156,8 @@
 			if (!ensure(options, ['agent'])) { return }; // Bail if we don't have enough info
 			if (!ensure(settings, ['baseUrl', 'owner', 'apiKey'])) { return }; // Bail if we don't have enough info
 
-			var url = constructUrl(['decisions', options.choices.toString()], options);
+			var choices = choicesAsObj(options.choices, options.decision);
+			var url = constructUrl(['decisions', choicesToStr(choices)], options);
 			var data = {apikey: settings.apiKey};
 			if (options.session != null) {data.session = options.session};
 			if (options.features) {
@@ -167,34 +168,42 @@
 			}
 
 			// Determine fallback selection - if anything goes wrong, we'll fall back to this
-			var selection;
-			if (typeof options.choices == 'number') {
-				selection = {code: 0};
-			} else if (typeof options.choices.join == 'function') { // it's an array
-				selection = {code: options.choices[0]};
+			var selection = {};
+			for (var key in choices) {
+				selection[key] = {code: choices[key][0]};
 			}
 
-
-			if (settings.caching) {
-				var decisions = storageRead(options, 'dec');
-				if (decisions && decisions[options.decision]) {
-					selection = decisions[options.decision];
-					if (typeof callback == 'function') {
-						callback.apply(this, [selection, null, 'stored', null]);
-						return;
-					}
+			returnSelection = function(selection, response, textStatus, jqXHR) {
+				if (typeof options.decision == 'string') {
+					selection = selection[options.decision];
+				} else if (!$.isPlainObject(options.choices)) {
+					var decisionCode = Object.keys(selection)[0]
+					selection = selection[decisionCode];
+				}
+				if (typeof callback == 'function') {
+					callback.apply(this, [selection, response, textStatus, jqXHR]);
 				}
 			}
 
+			// If local caching via HTML5 local storage is enabled
+			if (settings.caching) {
+				var decisions = storageRead(options, 'dec');
+				if (decisions) {
+					returnSelection(selection, null, 'stored', null);
+					return;
+				}
+			}
+
+			// Make request
 			doAjax(url, 'GET', data, function(response, textStatus, jqXHR) {
-				if (textStatus == 'success') {
-					selection = response.decisions[options.decision];
+				if (textStatus == 'success' && response.decisions) {
+					selection = response.decisions;
 					if (settings.caching && selection) {
 						storageWrite(options, 'dec', response.decisions);
 					}
 				}
 				if (typeof callback == 'function') {
-					callback.apply(this, [selection, response, textStatus, jqXHR]);
+					returnSelection(selection, textStatus, jqXHR);
 				}
 			})
 		},
@@ -238,6 +247,43 @@
 				}
 			})
 		}
+   	},
+
+   	choicesAsObj = function (choices, providedDecisionCode) {
+   		if (providedDecisionCode == null) {providedDecisionCode = ''};
+   		var result = {};
+   		if ($.isArray(choices)) {
+   			result[providedDecisionCode] = choices;
+   		} else if ($.isPlainObject(choices)) {
+   			result = choices;
+   		} else if (typeof choices == 'number') {
+   			var ar = [];
+   			for (var i = 0; i < choices; i++) {
+   				ar.push(i);
+   			}
+   			result[providedDecisionCode] = ar;
+   		} else if (typeof choices == 'string') {
+   			for (var part in choices.split(',')) {
+   				var pair = part.split(':');
+   				if (pair.length == 1) {
+   					pair.unshift(providedDecisionCode);
+   				}
+   				result[pair[0]] = pair[1].split(',');
+   			}
+   		}
+   		return result;
+   	},
+
+   	choicesToStr = function (choices) {
+   		var parts = [];
+   		for (var key in choices) {
+   			if (key == '') {
+   				parts.push( choices[key] );
+   			} else {
+   				parts.push( key + ':' + choices[key] );
+   			}
+   		}
+   		return parts.join('/');
    	},
 
    	// Interpret certain special "command" type decision strings such as "show" and "hide"

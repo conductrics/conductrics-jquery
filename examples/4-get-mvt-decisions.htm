@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Example 3</title>
+	<title>Example 4</title>
 
 <script src="./jquery.js"></script>
 <script src="../conductrics.jquery.js"></script>
@@ -11,14 +11,18 @@
 	$.conductrics({
 		owner: 'nate',
 		apiKey: '123',
-		agent:'jquery-example-3'
+		agent:'jquery-example-4'
 	})
 
 	$(document).ready(function() {
 
 		// Get a decision from Conductrics
-		$.conductrics('get-decision', {choices:['a','b']}, function(selection) {
-			console.log(selection);
+		var choices = {
+			'size': ['small','large'],
+			'color': ['blue','green','red']
+		}
+		$.conductrics('get-decision', {choices:choices, point:'my-point'}, function(selection) {
+			console.log('selection', selection);
 
 			switch (selection.code) {
 				case 'a':
