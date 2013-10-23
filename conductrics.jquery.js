@@ -137,19 +137,23 @@
 			var options = $.extend({
 				agent: settings.agent,
 				session: settings.session,
-				decision: 'decision-1',
-				choices: ['a','b']
+				decision: null, // 'decision' property
+				choices: ['a','b'],
+				point: null
 			}, options);
 
 			if (!ensure(options, ['agent'])) { return }; // Bail if we don't have enough info
 			if (!ensure(settings, ['baseUrl', 'owner', 'apiKey'])) { return }; // Bail if we don't have enough info
 
-			var choices = choicesAsObj(options.choices);
-			var url = constructUrl(['decisions', choicesToStr(options)], options);
+			var choices = choicesAsObj(options.choices, options.decision);
+			var url = constructUrl(['decisions', choicesToStr(choices)], options);
 			var data = {apikey: settings.apiKey};
 			if (options.session) {data.session = options.session};
 			if (options.features) {
 				data.features = sanitizeCodesStr(options.features);
+			}
+			if (typeof options.point == 'string') {
+				data.point = sanitizeCodesStr(options.point);
 			}
 
 			// Determine fallback selection - if anything goes wrong, we'll fall back to this
@@ -159,8 +163,11 @@
 			}
 
 			returnSelection = function(selection, response, textStatus, jqXHR) {
-				if (options.simplified) {
+				if (typeof options.decision == 'string') {
 					selection = selection[options.decision];
+				} else if (!$.isPlainObject(options.choices)) {
+					var decisionCode = Object.keys(selection)[0]
+					selection = selection[decisionCode];
 				}
 				if (typeof callback == 'function') {
 					callback.apply(this, [selection, response, textStatus, jqXHR]);
@@ -185,7 +192,7 @@
 					}
 				}
 				if (typeof callback == 'function') {
-					returnSelection(response, textStatus, jqXHR);
+					returnSelection(selection, textStatus, jqXHR);
 				}
 			})
 		},
@@ -232,10 +239,9 @@
    	},
 
    	choicesAsObj = function (choices, providedDecisionCode) {
-   		if (!providedDecisionCode) {providedDecisionCode = ''};
+   		if (providedDecisionCode == null) {providedDecisionCode = ''};
    		var result = {};
-   		if (false) {
-   		} else if ($.isArray(choices)) {
+   		if ($.isArray(choices)) {
    			result[providedDecisionCode] = choices;
    		} else if ($.isPlainObject(choices)) {
    			result = choices;
@@ -266,7 +272,7 @@
    				parts.push( key + ':' + choices[key] );
    			}
    		}
-   		return parts.join(',');
+   		return parts.join('/');
    	},
 
    	// Interpret certain special "command" type decision strings such as "show" and "hide"

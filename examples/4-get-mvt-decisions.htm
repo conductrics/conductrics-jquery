@@ -1,0 +1,50 @@
+<html>
+<head>
+	<title>Example 4</title>
+
+<script src="./jquery.js"></script>
+<script src="../conductrics.jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="./style.css">
+
+<script type="text/javascript">
+	// Initialize plugin
+	$.conductrics({
+		owner: 'nate',
+		apiKey: '123',
+		agent:'jquery-example-4'
+	})
+
+	$(document).ready(function() {
+
+		// Get a decision from Conductrics
+		var choices = {
+			'size': ['small','large'],
+			'color': ['blue','green','red']
+		}
+		$.conductrics('get-decision', {choices:choices, point:'my-point'}, function(selection) {
+			console.log('selection', selection);
+
+			switch (selection.code) {
+				case 'a':
+					// do something!
+					break;
+				case 'b':
+					// do something else!
+					break;
+			}
+		})
+
+		// Send a reward to Conductrics when success is achieved
+		$('.demo-goal').click(function() {
+			$.conductrics('send-goal')
+		})
+
+	})
+</script>
+
+</head>
+<body>
+	<!-- Button to send reward to Conductrics -->
+	<button class="demo-goal" type="button">I Love This Page</button>
+</body>
+</html>

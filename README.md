@@ -89,6 +89,21 @@ The most important property of this object is **choices**, which you can use to 
 
 2. A callback function which will receive the selection from the Conductrics service. The selection will be an object that has a **code** property, which will be one of the strings that were provided as options (so, in this example, you can expect selection.code to be either "big" or "small").
 
+##### Additional get-decision options:
+
+You can provide additional options to get-decision for advanced scenarios with multiple decisions (please refer to http://console.conductrics.com/docs/demo/multiples for an overview of what Conductrics provides to help you work with multiple decisions):
+
+1. Your options object can specify a `point` property, if you wish to use Conductrics decision points  to enable 'intelligent attribution' in relatively complex scenarios. The `point` option can be provided when calling get-decision, or can be provided to the constructor.
+
+2. To handle multiple decisions at a single decision point (multivariate-style selection), your options object can specify a `choices` property as an object, rather than a simple array. Each key in the choices object is a decision code, and the value of that key should be an array of the option codes for that decision. For instance:
+
+```javascript
+$.conductrics('get-decision', { choices: {size:['big', 'small'], color:['red','yellow','blue']} }, function(selection) {
+	// do whatever you want with the size and color properties of the returned selection
+	console.log(selection.size);
+	console.log(selection.color);
+}
+```
 ### 'send-goal' method
 
 Great. Your agent is making decisions for you and you're showing the appropriate content or functionality to your users.
@@ -238,6 +253,7 @@ Optional:
 + `agent` - an agent code for making decisions, sending rewards, etc -- the agent does not have to exist already on the server. Alternatively, you can pass an agent code to individual calls to get-decision, send-reward, and so on, which will take precedence over a code provided to the constructor.
 + `session` - a session identifier, if you want to provide your own -- if not provided, the Conductrics server will maintain its own session ID (see http://console.conductrics.com/docs/sessions). You can also pass a session code to individual calls to get-decision, send-reward, and so on, which will take precedence over a code provided to the constructor.
 + `features` - a string containing a list of targeting features that you want to pass to Conductrics. You can use this to give Conductrics additional information about the visitor. The feature(s) you provide will be combined with any targeting features by any targeting rules that you might have set up in your Conductrics account. For instance, to pass a fictional feature called 'is-VIP', you would add `features:'is-VIP'`. To pass multiple features, separate them with a comma, for example `features:'is-VIP,plays-tennis,plays-football'`. You can pass features when calling `get-decision` or any of the decision-making helper methods (the `features` parameter is not supported when sending rewards or expiring sessions). Please see the "Passing features yourself" part of our Targeting Rules instructions at http://console.conductrics.com/docs/targeting/targeting-rules for an overview.
++ `point` - a point code for making decisions, if you wish to use the Conductrics 'point' system for intelligent attribution of rewards during a visitor's session. This only matters in relatively complex scenarios, where there are multiple decisions to make and they don't all happen at the same time. See http://console.conductrics.com/docs/demo/multiples for details about points.
 + `baseUrl` - the Conductrics server to communicate with -- the default is `https://api.conductrics.com` which is typically correct.
 + `caching` - if set to `localStorage`, the plugin will cache decisions using the HTML5 localStorage API if available, which means that the plugin will not go back to the server repeatedly to get a decision (for a given agent and session).
 + `cachingMaxAge` - the maximum amount of time to store cached decisions locally, expressed in seconds -- the default is 1800 (30 minutes).
