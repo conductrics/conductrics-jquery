@@ -189,7 +189,7 @@
 			if (settings.caching) {
 				var decisions = storageRead(options, 'dec');
 				if (decisions) {
-					returnSelection(selection, null, 'stored', null);
+					returnSelection(decisions, null, 'stored', null);
 					return;
 				}
 			}
