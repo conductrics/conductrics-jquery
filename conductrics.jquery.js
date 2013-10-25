@@ -177,7 +177,12 @@
 				if (typeof options.decision == 'string') {
 					selection = selection[options.decision];
 				} else if (!$.isPlainObject(options.choices)) {
-					var decisionCode = Object.keys(selection)[0]
+					var decisionCode = null; /* can't rely on Object.keys in IE 8 */
+					$.each(selection, function(key, val) {
+						if (decisionCode == undefined) {
+							decisionCode = key;
+						}
+					});
 					selection = selection[decisionCode];
 				}
 				if (typeof callback == 'function') {
@@ -458,6 +463,13 @@
 
 	// Simple wrapper around $.ajax
 	doAjax = function(url, type, data, callback) {
+		/* If XDomainRequest will be used (IE 8/9), 'POST' doesn't work as expected, so we'll just use 'GET' */
+		if ( type == 'POST' && window.XDomainRequest && (window.XMLHttpRequest == undefined || new window.XMLHttpRequest().withCredentials == undefined) ) {
+			type = 'GET';
+			if ($.isPlainObject(data)) {
+				data._method = 'POST';
+			}
+		}
 
 		// Local cookie support, if enabled
 		if (data.session == null && settings.sessionCookies) {
@@ -591,8 +603,8 @@
 })(jQuery, document);
 
 (function( jQuery ) {
-
-if ( window.XDomainRequest ) {
+/* use XDomainRequest if the native XMLHttpRequest doesn't support 'withCredentials' which is a sign that it doesn't implement CORS - in practice this means IE 8/9 will use this, but 10+ will work 'normally' */
+if ( window.XDomainRequest && (window.XMLHttpRequest == undefined || new window.XMLHttpRequest().withCredentials == undefined) ) {
 	jQuery.ajaxTransport(function( s ) {
 		if ( s.crossDomain && s.async ) {
 			if ( s.timeout ) {
