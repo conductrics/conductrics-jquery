@@ -15,8 +15,9 @@
 		})
 
 		// Have Conductrics either show or hide something
-		$('.demo-option-a').conductrics('toggle', {agent:'jquery-example-2-a'})
-		$('.demo-option-a').conductrics('toggle', {agent:'jquery-example-2-b'})
+		$('.demo-first-thing').conductrics('toggle', {agent:'jquery-example-2-a'})
+		// Have Conductrics either show or hide some other thing, using a separate agent
+		$('.demo-second-thing').conductrics('toggle', {agent:'jquery-example-2-b'})
 
 		// Send a reward to Conductrics when success is achieved
 		$('.demo-goal').click(function() {
@@ -29,8 +30,9 @@
 </head>
 <body>
 	<!-- This div gets shown or hidden -->
-	<div class="demo-option demo-option-a">Option A</div>
-	<div class="demo-option demo-option-b">Option B</div>
+	<div class="demo-option demo-first-thing">First Thing</div>
+	<!-- This div is the second thing that gets shown or hidden -->
+	<div class="demo-option demo-second-thing">Second Thing</div>
 	<!-- Button to send reward to Conductrics -->
 	<button class="demo-goal" type="button">I Love This Page</button>
 </body>
