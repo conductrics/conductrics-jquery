@@ -205,7 +205,7 @@ And then, at the bottom of the page (no need to wait for document.ready, though 
 
 ```javascript
 // Have Conductrics run test(s) for each set of elements marked with the appropriate attributes (if any)
-$('.conductrics-selection').conductrics('autowire');
+$('.conductrics-experience').conductrics('autowire');
 ```
 
 When the page is viewed, the agent will select between the two pieces of content, and make the selected one visible (the other will remain hidden per the CSS style).
