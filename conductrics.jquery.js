@@ -8,7 +8,7 @@
 		init : function(settingz) {
 			// developer may override any of these defaults
 			settings = $.extend(true, {
-				'baseUrl': 'http://api.conductrics.com',
+				'baseUrl': '//api.conductrics.com',
 				'apiKey': null,
 				'agent': null,
 				'session': null,
